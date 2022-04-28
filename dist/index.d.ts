@@ -65,6 +65,10 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
     _body(): string;
     _reset(): void;
     /**
+     * Create a new type extending this one
+     */
+    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<T & TypeOfShape<S>>;
+    /**
      * @hidden
      */
     renderSchema(): string;
