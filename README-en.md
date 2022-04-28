@@ -4,7 +4,7 @@
 <img alt="npm" src="https://img.shields.io/npm/v/@schuelerconnect/schema?color=red&style=for-the-badge">
 <img alt="NPM" src="https://img.shields.io/npm/l/@schuelerconnect/schema?color=orange&style=for-the-badge">
 <img alt="npm" src="https://img.shields.io/npm/dt/@schuelerconnect/schema?color=yellow&style=for-the-badge">
-<img alt="GitHub issues" src="https://img.shields.io/github/issues/schueler-connect/@schuelerconnect/schema?color=green&style=for-the-badge">
+<img alt="GitHub issues" src="https://img.shields.io/github/issues/schueler-connect/schema?color=green&style=for-the-badge">
 </p>
 <p>Built with ❤️ by <a href="https://github.com/codemaster138">@codemaster138</a></p>
 <img alt="" src="assets/cover.png"/>

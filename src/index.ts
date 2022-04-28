@@ -146,7 +146,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
 		if (this.written) return "";
 		this.written = true;
 		return `${this._docstring ? `"""\n${this._docstring}\n"""\n` : ""}type ${
-			this.name
+			this.name.replace("!", "")
 		} {\n${indent(
 			Object.entries(this.shape)
 				.map(
@@ -194,6 +194,13 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
 				.join("\n")
 				.replace(/}\n/g, "}\n\n") + "\n"
 		);
+	}
+
+	required(): InterfaceSchemaType<
+		TrivialResolver<Exclude<Resolved<T>, undefined>>
+	> {
+		if (this.name.endsWith("!")) throw "Already non-nullable";
+		return new InterfaceSchemaType(this.name + "!", this.shape) as any;
 	}
 }
 
