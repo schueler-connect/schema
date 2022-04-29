@@ -73,6 +73,7 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
      */
     renderSchema(): string;
     toGraphQL(): string;
+    required(): InterfaceSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined>>>;
 }
 export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S>>;
 declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>> extends SchemaType<F> {
