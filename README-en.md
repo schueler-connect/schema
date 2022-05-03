@@ -223,6 +223,7 @@ const myResolvers: schemaTypings = {
 ## Known shortcomings
 
 - `union`s are currently not supported
+- Custom scalars are not supported
 
 <div align="center">
 <img alt="" src="assets/footer.png"/>
