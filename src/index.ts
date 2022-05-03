@@ -215,6 +215,7 @@ class ResolverSchemaType<
 
   _body() {
     return Object.values(this.args)
+      .concat(this.returns)
       .map((v: any) => v._body())
       .join("\n");
   }
