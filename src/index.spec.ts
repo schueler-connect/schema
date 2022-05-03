@@ -334,7 +334,7 @@ describe("$.type", () => {
         "  v: Test\n" +
         "}\n" +
         "\n" +
-				'"""\n' +
+        '"""\n' +
         "A comment\n" +
         '"""\n' +
         "type Test {\n" +
@@ -472,6 +472,12 @@ describe("$.array", () => {
         "}\n"
     );
   });
+
+  test("Cannot be doubly required", () => {
+    expect(() => $.type("X", {}).required().required()).toThrow(
+      "Already non-nullable"
+    );
+  });
 });
 
 describe("$.resolver", () => {
@@ -530,5 +536,125 @@ describe("$.resolver", () => {
         "  b: Float\n" +
         "}\n"
     );
+  });
+
+  test("With doc comment", () => {
+    const r = $.resolver({ a: $.string.required() }, $.int);
+    const w = $.type("Wrapper", {
+      v: r.docstring("A comment"),
+    });
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        '  """\n' +
+        "  A comment\n" +
+        '  """\n' +
+        "  v(a: String!): Int\n" +
+        "}\n"
+    );
+  });
+});
+
+describe("Schema", () => {
+  test("Simple schema", () => {
+    const s = $.schema(
+      {
+        counter: $.int.required(),
+        stats: $.type("Stats", {
+          mostRecentChange: $.int.docstring(
+            "Milliseconds since epoch at last change or null if no change has been made yet"
+          ),
+        })
+          .required()
+          .typeDocstring("Statistics about the application"),
+      },
+      {
+        setCounter: $.resolver({ n: $.int.required() }, $.bool).docstring(
+          "Update the counter"
+        ),
+      }
+    );
+
+    type expectS = {
+      mostRecentChange:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    };
+
+    expectType<{
+      Query: {
+        counter: number | ((...args: any) => number | Promise<number>);
+        stats: expectS | ((...args: any) => expectS | Promise<expectS>);
+      };
+      Mutation: {
+        setCounter: (
+          parent: any,
+          args: { n: number },
+          ctx: any,
+          info: any
+        ) =>
+          | boolean
+          | undefined
+          | ((
+              ...args: any
+            ) => boolean | undefined | Promise<boolean | undefined>)
+          | Promise<
+              | boolean
+              | undefined
+              | ((
+                  ...args: any
+                ) => boolean | undefined | Promise<boolean | undefined>)
+            >;
+      };
+    }>({} as $.Infer<typeof s>);
+
+    expect(s.toGraphQL()).toBe(
+      "" +
+        "type Query {\n" +
+        "  counter: Int!,\n" +
+        "  stats: Stats!\n" +
+        "}\n" +
+        "\n" +
+        '"""\n' +
+        "Statistics about the application\n" +
+        '"""\n' +
+        "type Stats {\n" +
+        '  """\n' +
+        "  Milliseconds since epoch at last change or null if no change has been made yet\n" +
+        '  """\n' +
+        "  mostRecentChange: Int\n" +
+        "}\n" +
+        "\n" +
+        "type Mutation {\n" +
+        '  """\n' +
+        "  Update the counter\n" +
+        '  """\n' +
+        "  setCounter(n: Int!): Boolean\n" +
+        "}\n"
+    );
+  });
+
+  test("Cloneable", () => {
+    const s = $.schema(
+      {
+        counter: $.int.required(),
+        stats: $.type("Stats", {
+          mostRecentChange: $.int.docstring(
+            "Milliseconds since epoch at last change or null if no change has been made yet"
+          ),
+        })
+          .required()
+          .typeDocstring("Statistics about the application"),
+      },
+      {
+        setCounter: $.resolver({ n: $.int.required() }, $.bool).docstring(
+          "Update the counter"
+        ),
+      }
+    );
+
+    expect(s.clone()).toStrictEqual(s);
   });
 });
