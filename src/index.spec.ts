@@ -2,6 +2,45 @@ import { expectType } from "tsd";
 
 import * as $ from ".";
 
+describe('SchemaType', () => {
+	test('Cannot be cloned', () => {
+		expect(() => new $.SchemaType().clone()).toThrow("not implemented");
+	});
+
+	test('Cannot be rendered', () => {
+		expect(() => new $.SchemaType()._render()).toThrow("not implemented");
+		expect(() => new $.SchemaType()._body()).toThrow("not implemented");
+	});
+})
+
+describe("$.{type}", () => {
+  test("Cannot be doubly required", () => {
+    expect(() => $.int.required().required()).toThrow("Already non-nullable");
+  });
+
+  test("Clones correctly", () => {
+    expect($.int.clone()).toStrictEqual($.int);
+  });
+
+  test("Can be documented", () => {
+    const w = $.type("Wrapper", {
+      a: $.int.docstring("A comment"),
+      b: $.int,
+    });
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        '  """\n' +
+        "  A comment\n" +
+        '  """\n' +
+        "  a: Int,\n" +
+        "  b: Int\n" +
+        "}\n"
+    );
+  });
+});
+
 describe("$.type", () => {
   test("Flat partial type", () => {
     const t = $.type("Test", {
@@ -431,7 +470,12 @@ describe("$.resolver", () => {
       "" +
         "type Wrapper {\n" +
         "  v(anumber: Int, astring: String, i: I): I\n" +
-        "}\n" + "\n" + "type I {\n" + "  a: Int!,\n" + "  b: Float\n" + "}\n"
+        "}\n" +
+        "\n" +
+        "type I {\n" +
+        "  a: Int!,\n" +
+        "  b: Float\n" +
+        "}\n"
     );
   });
 });

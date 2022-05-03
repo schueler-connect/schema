@@ -9,7 +9,7 @@
     "build": "parcel build --no-source-maps src/index.ts && terser dist/index.js --compress --mangle --toplevel -o dist/index.js",
     "prepublish": "npm run build",
     "prepare": "husky install",
-    "test": "jest --coverage --coverageReporters=json-summary && curl \"https://shields.io/static/v1?label=Coverage&message=$(node -e \"process.stdout.write(JSON.parse(require('fs').readFileSync('./coverage/coverage-summary.json')).total.lines.pct.toFixed(0))\")%25&color=green&style=for-the-badge\" -o coverage.svg"
+    "test": "jest --coverage && curl \"https://shields.io/static/v1?label=Coverage&message=$(node -e \"process.stdout.write(JSON.parse(require('fs').readFileSync('./coverage/coverage-summary.json')).total.lines.pct.toFixed(0))\")%25&color=green&style=for-the-badge\" -o coverage.svg"
   },
   "files": [
     "dist"
