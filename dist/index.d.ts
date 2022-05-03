@@ -36,7 +36,7 @@ declare class SchemaType<T = unknown> {
 }
 declare class TrivialSchemaType<T> extends SchemaType<T> {
     protected gql: string;
-    constructor(gql: string);
+    constructor(gql: string, __body?: (() => string) | undefined);
     clone(): TrivialSchemaType<T>;
     _render(): string;
     _body(): string;
@@ -57,11 +57,10 @@ export const int: TrivialSchemaType<TrivialResolver<number | undefined>>;
 export const float: TrivialSchemaType<TrivialResolver<number | undefined>>;
 export const string: TrivialSchemaType<TrivialResolver<string | undefined>>;
 export const id: TrivialSchemaType<TrivialResolver<string | undefined>>;
-declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[]>> {
+declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[] | undefined>> {
     inner: SchemaType<T>;
     constructor(gql: string, inner: SchemaType<T>);
     clone(): ArraySchemaType<T>;
-    _body(): string;
     _reset(): void;
 }
 export const array: <T>(t: SchemaType<T>) => ArraySchemaType<T>;

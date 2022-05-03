@@ -61,7 +61,7 @@ class SchemaType<T = unknown> {
 }
 
 class TrivialSchemaType<T> extends SchemaType<T> {
-  constructor(protected gql: string) {
+  constructor(protected gql: string, private __body?: () => string) {
     super();
   }
 
@@ -74,7 +74,7 @@ class TrivialSchemaType<T> extends SchemaType<T> {
   }
 
   _body() {
-    return "";
+    return this.__body?.() || "";
   }
 
   /**
@@ -86,7 +86,7 @@ class TrivialSchemaType<T> extends SchemaType<T> {
     if (this.gql.endsWith("!")) throw "Already non-nullable";
     return new TrivialSchemaType<
       TrivialResolver<Exclude<Resolved<T>, undefined>>
-    >(this.gql + "!");
+    >(this.gql + "!", this.__body);
   }
 }
 
@@ -125,18 +125,14 @@ export const id = new TrivialSchemaType<TrivialResolver<string | undefined>>(
 // TODO: export const customScalar = () => {};
 
 class ArraySchemaType<T> extends TrivialSchemaType<
-  TrivialResolver<Resolved<T>[]>
+  TrivialResolver<Resolved<T>[] | undefined>
 > {
   constructor(gql: string, public inner: SchemaType<T>) {
-    super(gql);
+    super(gql, () => inner._body());
   }
 
   clone() {
     return new ArraySchemaType<T>(this.gql, this.inner);
-  }
-
-  _body(): string {
-    return this.inner._body();
   }
 
   _reset() {
