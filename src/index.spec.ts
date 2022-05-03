@@ -381,3 +381,57 @@ describe("$.array", () => {
     );
   });
 });
+
+describe("$.resolver", () => {
+  test("Resolver", () => {
+    const i = $.type("I", {
+      a: $.int.required(),
+      b: $.float,
+    });
+
+    type expectI = {
+      a: number | ((...args: any) => number | Promise<number>);
+      b:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    };
+    expectType<expectI>({} as $.Infer<typeof i>);
+
+    const r = $.resolver({ anumber: $.int, astring: $.string, i: i }, i);
+
+    const w = $.type("Wrapper", {
+      v: r,
+    });
+
+    expectType<{
+      v: (
+        parent: any,
+        args: {
+          anumber: number | undefined;
+          astring: string | undefined;
+          i: { a: number; b: number | undefined };
+        },
+        ctx: any,
+        info: any
+      ) =>
+        | expectI
+        | undefined
+        | ((...args: any) => expectI | undefined | Promise<expectI | undefined>)
+        | Promise<
+            | expectI
+            | undefined
+            | ((
+                ...args: any
+              ) => expectI | undefined | Promise<expectI | undefined>)
+          >;
+    }>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        "  v(anumber: Int, astring: String, i: I): I\n" +
+        "}\n" + "\n" + "type I {\n" + "  a: Int!,\n" + "  b: Float\n" + "}\n"
+    );
+  });
+});
