@@ -16,7 +16,7 @@ class SharedBoolean {
 	constructor(public inner: boolean) {}
 }
 
-class SchemaType<T = unknown> {
+export class SchemaType<T = unknown> {
   // Required for type inference
   public p?: T;
   protected _docstring?: string;

@@ -11,7 +11,7 @@ declare class SharedBoolean {
     inner: boolean;
     constructor(inner: boolean);
 }
-declare class SchemaType<T = unknown> {
+export class SchemaType<T = unknown> {
     p?: T;
     protected _docstring?: string;
     constructor();
