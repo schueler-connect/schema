@@ -247,7 +247,10 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: boolean | ((...args: any) => boolean | Promise<boolean>);
       anid: string | ((...args: any) => string | Promise<string>);
-      anotherid: string | undefined | ((...args: any) => string | undefined | Promise<string | undefined>);
+      anotherid:
+        | string
+        | undefined
+        | ((...args: any) => string | undefined | Promise<string | undefined>);
     }>({} as $.Infer<typeof e>);
 
     expect(e.toGraphQL()).toBe(
@@ -259,6 +262,121 @@ describe("$.type", () => {
         "  astring: Boolean!,\n" +
         "  anid: ID!,\n" +
         "  anotherid: ID\n" +
+        "}\n"
+    );
+  });
+});
+
+describe("$.array", () => {
+  test("Primitive array", () => {
+    const a = $.array($.string);
+
+    expectType<
+      | (string | undefined)[]
+      | undefined
+      | ((
+          ...args: any
+        ) =>
+          | (string | undefined)[]
+          | undefined
+          | Promise<(string | undefined)[] | undefined>)
+    >([] as $.Infer<typeof a>);
+
+    const w = $.type("Wrapper", {
+      v: a.required(),
+    });
+
+    expectType<{
+      v:
+        | (string | undefined)[]
+        | ((
+            ...args: any
+          ) => (string | undefined)[] | Promise<(string | undefined)[]>);
+    }>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" + "type Wrapper {\n" + "  v: [String]!\n" + "}\n"
+    );
+  });
+
+  test("Optional type array", () => {
+    const a = $.array($.type("X", { x: $.int.required() }));
+
+    expectType<
+      | ({ x: number } | undefined)[]
+      | undefined
+      | ((
+          ...args: any
+        ) =>
+          | ({ x: number } | undefined)[]
+          | undefined
+          | Promise<({ x: number } | undefined)[] | undefined>)
+    >([] as $.Infer<typeof a>);
+
+    const w = $.type("Wrapper", {
+      v: a,
+    });
+
+    expectType<{
+      v:
+        | ({ x: number } | undefined)[]
+        | undefined
+        | ((
+            ...args: any
+          ) =>
+            | ({ x: number } | undefined)[]
+            | undefined
+            | Promise<({ x: number } | undefined)[] | undefined>);
+    }>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        "  v: [X]\n" +
+        "}\n" +
+        "\n" +
+        "type X {\n" +
+        "  x: Int!\n" +
+        "}\n"
+    );
+  });
+
+  test("Required type array", () => {
+    const a = $.array($.type("X", { x: $.int.required() }));
+
+    expectType<
+      | ({ x: number } | undefined)[]
+      | undefined
+      | ((
+          ...args: any
+        ) =>
+          | ({ x: number } | undefined)[]
+          | undefined
+          | Promise<({ x: number } | undefined)[] | undefined>)
+    >([] as $.Infer<typeof a>);
+
+    const w = $.type("Wrapper", {
+      v: a.required(),
+    });
+
+    expectType<{
+      v:
+        | ({ x: number } | undefined)[]
+        | ((
+            ...args: any
+          ) =>
+            | ({ x: number } | undefined)[]
+            | Promise<({ x: number } | undefined)[]>);
+    }>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        "  v: [X]!\n" +
+        "}\n" +
+        "\n" +
+        "type X {\n" +
+        "  x: Int!\n" +
         "}\n"
     );
   });
