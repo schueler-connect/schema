@@ -304,6 +304,44 @@ describe("$.type", () => {
         "}\n"
     );
   });
+
+  test("With doc comment", () => {
+    const t = $.type("Test", { a: $.string });
+    const w = $.type("Wrapper", { v: t.docstring("A comment") });
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        '  """\n' +
+        "  A comment\n" +
+        '  """\n' +
+        "  v: Test\n" +
+        "}\n" +
+        "\n" +
+        "type Test {\n" +
+        "  a: String\n" +
+        "}\n"
+    );
+  });
+
+  test("With type-level doc comment", () => {
+    const t = $.type("Test", { a: $.string }).typeDocstring("A comment");
+    const w = $.type("Wrapper", { v: t });
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        "  v: Test\n" +
+        "}\n" +
+        "\n" +
+				'"""\n' +
+        "A comment\n" +
+        '"""\n' +
+        "type Test {\n" +
+        "  a: String\n" +
+        "}\n"
+    );
+  });
 });
 
 describe("$.array", () => {
