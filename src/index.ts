@@ -12,6 +12,10 @@ interface Shape {
   [key: string]: SchemaType | Shape;
 }
 
+class SharedBoolean {
+	constructor(public inner: boolean) {}
+}
+
 class SchemaType<T = unknown> {
   // Required for type inference
   public p?: T;
@@ -132,7 +136,6 @@ class ArraySchemaType<T> extends TrivialSchemaType<
   }
 
   _body(): string {
-    // TODO: Implement
     return this.inner._body();
   }
 
@@ -151,14 +154,12 @@ type Common<A, B> = {
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
 class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
-  written: boolean = false;
-
-  constructor(private name: string, public shape: T) {
+  constructor(private name: string, public shape: T, public written: SharedBoolean) {
     super();
   }
 
   clone() {
-    return new InterfaceSchemaType<T>(this.name, this.shape);
+    return new InterfaceSchemaType<T>(this.name, this.shape, new SharedBoolean(false));
   }
 
   _render() {
@@ -166,8 +167,8 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   }
 
   _body() {
-    if (this.written) return "";
-    this.written = true;
+    if (this.written.inner) return "";
+    this.written.inner = true;
     return `${
       this._docstring ? `"""\n${this._docstring}\n"""\n` : ""
     }type ${this.name.replace("!", "")} {\n${indent(
@@ -185,7 +186,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   }
 
   _reset() {
-    this.written = false;
+    this.written.inner = false;
     Object.values(this.shape).forEach((v: SchemaType) => v._reset());
   }
 
@@ -199,7 +200,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     return new InterfaceSchemaType(name, {
       ...this.shape,
       ...shape,
-    }) as InterfaceSchemaType<any>;
+    }, new SharedBoolean(false)) as InterfaceSchemaType<any>;
   }
 
   toGraphQL() {
@@ -218,7 +219,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     TrivialResolver<Exclude<Resolved<T>, undefined>>
   > {
     if (this.name.endsWith("!")) throw "Already non-nullable";
-    return new InterfaceSchemaType(this.name + "!", this.shape) as any;
+    return new InterfaceSchemaType(this.name + "!", this.shape, this.written) as any;
   }
 }
 
@@ -226,7 +227,7 @@ export const type = <S extends Shape = Shape>(
   name: string,
   shape: S
 ): InterfaceSchemaType<TypeOfShape<S>> =>
-  new InterfaceSchemaType(name, shape) as InterfaceSchemaType<any>;
+  new InterfaceSchemaType(name, shape, new SharedBoolean(false)) as InterfaceSchemaType<any>;
 
 class ResolverSchemaType<
   R extends SchemaType,
@@ -286,7 +287,7 @@ class Schema<
     private queries: InterfaceSchemaType<Q>,
     private mutations: InterfaceSchemaType<M>
   ) {
-    super("Schema", { Query: queries.shape, Mutation: mutations.shape });
+    super("Schema", { Query: queries.shape, Mutation: mutations.shape }, new SharedBoolean(false));
   }
 
   clone() {

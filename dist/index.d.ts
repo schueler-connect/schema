@@ -7,6 +7,10 @@ type TypeOfShape<S extends SchemaType | Shape> = S extends SchemaType<infer X> ?
 interface Shape {
     [key: string]: SchemaType | Shape;
 }
+declare class SharedBoolean {
+    inner: boolean;
+    constructor(inner: boolean);
+}
 declare class SchemaType<T = unknown> {
     p?: T;
     protected _docstring?: string;
@@ -67,8 +71,8 @@ type Common<A, B> = {
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 declare class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     shape: T;
-    written: boolean;
-    constructor(name: string, shape: T);
+    written: SharedBoolean;
+    constructor(name: string, shape: T, written: SharedBoolean);
     clone(): InterfaceSchemaType<T>;
     _render(): string;
     _body(): string;
