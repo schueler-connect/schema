@@ -214,7 +214,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   }
 
   required(): InterfaceSchemaType<
-    TrivialResolver<Exclude<Resolved<T>, undefined>>
+    Exclude<T, undefined>
   > {
     if (this.name.endsWith("!")) throw "Already non-nullable";
     return new InterfaceSchemaType(this.name + "!", this.shape, this.written) as any;

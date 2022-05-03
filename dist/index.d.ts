@@ -81,7 +81,7 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
      */
     extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<T, TypeOfShape<S>>>;
     toGraphQL(): string;
-    required(): InterfaceSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined>>>;
+    required(): InterfaceSchemaType<Exclude<T, undefined>>;
     typeDocstring(str: string): InterfaceSchemaType<T>;
 }
 export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S>>;
