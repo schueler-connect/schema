@@ -42,5 +42,5 @@ jobs:
           git config --global user.email 'codemaster138@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add dist coverage.svg
-          git commit -m "chore(auto): Build & test"
+          git commit --allow-empty -m "chore(auto): Build & test"
           git push
