@@ -1,0 +1,265 @@
+import { expectType } from "tsd";
+
+import * as $ from ".";
+
+describe("$.type", () => {
+  test("Flat partial type", () => {
+    const t = $.type("Test", {
+      aninteger: $.int,
+      afloat: $.float,
+      abool: $.bool,
+      astring: $.string,
+      anid: $.id,
+    });
+
+    expectType<{
+      aninteger:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+      afloat:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+      abool:
+        | boolean
+        | undefined
+        | ((
+            ...args: any
+          ) => boolean | undefined | Promise<boolean | undefined>);
+      astring:
+        | string
+        | undefined
+        | ((...args: any) => string | undefined | Promise<string | undefined>);
+      anid:
+        | string
+        | undefined
+        | ((...args: any) => string | undefined | Promise<string | undefined>);
+    }>({} as $.Infer<typeof t>);
+
+    expect(t.toGraphQL()).toBe(
+      "" +
+        "type Test {\n" +
+        "  aninteger: Int,\n" +
+        "  afloat: Float,\n" +
+        "  abool: Boolean,\n" +
+        "  astring: String,\n" +
+        "  anid: ID\n" +
+        "}\n"
+    );
+  });
+
+  test("Flat type with required properties", () => {
+    const t = $.type("Test", {
+      aninteger: $.int.required(),
+      afloat: $.float.required(),
+      abool: $.bool.required(),
+      astring: $.string.required(),
+      anid: $.id.required(),
+    });
+
+    expectType<{
+      aninteger: number | ((...args: any) => number | Promise<number>);
+      afloat: number | ((...args: any) => number | Promise<number>);
+      abool: boolean | ((...args: any) => boolean | Promise<boolean>);
+      astring: string | ((...args: any) => string | Promise<string>);
+      anid: string | ((...args: any) => string | Promise<string>);
+    }>({} as $.Infer<typeof t>);
+
+    expect(t.toGraphQL()).toBe(
+      "" +
+        "type Test {\n" +
+        "  aninteger: Int!,\n" +
+        "  afloat: Float!,\n" +
+        "  abool: Boolean!,\n" +
+        "  astring: String!,\n" +
+        "  anid: ID!\n" +
+        "}\n"
+    );
+  });
+
+  test("Singly nested type", () => {
+    const t = $.type("Test", {
+      aninteger: $.int.required(),
+      afloat: $.float.required(),
+      abool: $.bool.required(),
+      astring: $.string.required(),
+      anid: $.id.required(),
+    });
+
+    type expectT = {
+      aninteger: number | ((...args: any) => number | Promise<number>);
+      afloat: number | ((...args: any) => number | Promise<number>);
+      abool: boolean | ((...args: any) => boolean | Promise<boolean>);
+      astring: string | ((...args: any) => string | Promise<string>);
+      anid: string | ((...args: any) => string | Promise<string>);
+    };
+    expectType<expectT>({} as $.Infer<typeof t>);
+
+    const p = $.type("Parent", {
+      reqchild: t.required(),
+      child: t,
+      x: $.int,
+    });
+
+    expectType<{
+      reqchild: expectT | ((...args: any) => expectT | Promise<expectT>);
+      child:
+        | expectT
+        | undefined
+        | ((
+            ...args: any
+          ) => expectT | undefined | Promise<expectT | undefined>);
+      x:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    }>({} as $.Infer<typeof p>);
+
+    expect(p.toGraphQL()).toBe(
+      "" +
+        "type Parent {\n" +
+        "  reqchild: Test!,\n" +
+        "  child: Test,\n" +
+        "  x: Int\n" +
+        "}\n" +
+        "\n" +
+        "type Test {\n" +
+        "  aninteger: Int!,\n" +
+        "  afloat: Float!,\n" +
+        "  abool: Boolean!,\n" +
+        "  astring: String!,\n" +
+        "  anid: ID!\n" +
+        "}\n"
+    );
+  });
+
+  test("Deeply nested type", () => {
+    const t = $.type("Child", {
+      aninteger: $.int.required(),
+      afloat: $.float.required(),
+      abool: $.bool.required(),
+      astring: $.string.required(),
+      anid: $.id.required(),
+    });
+
+    type expectT = {
+      aninteger: number | ((...args: any) => number | Promise<number>);
+      afloat: number | ((...args: any) => number | Promise<number>);
+      abool: boolean | ((...args: any) => boolean | Promise<boolean>);
+      astring: string | ((...args: any) => string | Promise<string>);
+      anid: string | ((...args: any) => string | Promise<string>);
+    };
+    expectType<expectT>({} as $.Infer<typeof t>);
+
+    const p = $.type("Parent", {
+      reqchild: t.required(),
+      child: t,
+      x: $.int,
+    });
+
+    type expectP = {
+      reqchild: expectT | ((...args: any) => expectT | Promise<expectT>);
+      child:
+        | expectT
+        | undefined
+        | ((
+            ...args: any
+          ) => expectT | undefined | Promise<expectT | undefined>);
+      x:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    };
+    expectType<expectP>({} as $.Infer<typeof p>);
+
+    const g = $.type("Grandparent", {
+      reqchild: p.required(),
+      child: p,
+      x: $.int,
+    });
+    expectType<{
+      reqchild: expectP | ((...args: any) => expectP | Promise<expectP>);
+      child:
+        | expectP
+        | undefined
+        | ((
+            ...args: any
+          ) => expectP | undefined | Promise<expectP | undefined>);
+      x:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    }>({} as $.Infer<typeof g>);
+
+    expect(g.toGraphQL()).toBe(
+      "" +
+        "type Grandparent {\n" +
+        "  reqchild: Parent!,\n" +
+        "  child: Parent,\n" +
+        "  x: Int\n" +
+        "}\n" +
+        "\n" +
+        "type Parent {\n" +
+        "  reqchild: Child!,\n" +
+        "  child: Child,\n" +
+        "  x: Int\n" +
+        "}\n" +
+        "\n" +
+        "type Child {\n" +
+        "  aninteger: Int!,\n" +
+        "  afloat: Float!,\n" +
+        "  abool: Boolean!,\n" +
+        "  astring: String!,\n" +
+        "  anid: ID!\n" +
+        "}\n"
+    );
+  });
+
+  test("Extended type", () => {
+    const t = $.type("Test", {
+      aninteger: $.int.required(),
+      afloat: $.float.required(),
+      abool: $.bool.required(),
+      astring: $.string.required(),
+      anid: $.id.required(),
+    });
+
+    type expectT = {
+      aninteger: number | ((...args: any) => number | Promise<number>);
+      afloat: number | ((...args: any) => number | Promise<number>);
+      abool: boolean | ((...args: any) => boolean | Promise<boolean>);
+      astring: string | ((...args: any) => string | Promise<string>);
+      anid: string | ((...args: any) => string | Promise<string>);
+    };
+    expectType<expectT>({} as $.Infer<typeof t>);
+
+    const e = t.extend("Extended", {
+      // Override
+      astring: $.bool.required(),
+      // Add field
+      anotherid: $.id,
+    });
+
+    expectType<{
+      aninteger: number | ((...args: any) => number | Promise<number>);
+      afloat: number | ((...args: any) => number | Promise<number>);
+      abool: boolean | ((...args: any) => boolean | Promise<boolean>);
+      astring: boolean | ((...args: any) => boolean | Promise<boolean>);
+      anid: string | ((...args: any) => string | Promise<string>);
+      anotherid: string | undefined | ((...args: any) => string | undefined | Promise<string | undefined>);
+    }>({} as $.Infer<typeof e>);
+
+    expect(e.toGraphQL()).toBe(
+      "" +
+        "type Extended {\n" +
+        "  aninteger: Int!,\n" +
+        "  afloat: Float!,\n" +
+        "  abool: Boolean!,\n" +
+        "  astring: Boolean!,\n" +
+        "  anid: ID!,\n" +
+        "  anotherid: ID\n" +
+        "}\n"
+    );
+  });
+});
