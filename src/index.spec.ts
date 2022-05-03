@@ -2,16 +2,16 @@ import { expectType } from "tsd";
 
 import * as $ from ".";
 
-describe('SchemaType', () => {
-	test('Cannot be cloned', () => {
-		expect(() => new $.SchemaType().clone()).toThrow("not implemented");
-	});
+describe("SchemaType", () => {
+  test("Cannot be cloned", () => {
+    expect(() => new $.SchemaType().clone()).toThrow("not implemented");
+  });
 
-	test('Cannot be rendered', () => {
-		expect(() => new $.SchemaType()._render()).toThrow("not implemented");
-		expect(() => new $.SchemaType()._body()).toThrow("not implemented");
-	});
-})
+  test("Cannot be rendered", () => {
+    expect(() => new $.SchemaType()._render()).toThrow("not implemented");
+    expect(() => new $.SchemaType()._body()).toThrow("not implemented");
+  });
+});
 
 describe("$.{type}", () => {
   test("Cannot be doubly required", () => {
@@ -416,6 +416,21 @@ describe("$.array", () => {
         "\n" +
         "type X {\n" +
         "  x: Int!\n" +
+        "}\n"
+    );
+  });
+
+  test("With doc comment", () => {
+    const a = $.array($.string);
+    const w = $.type("Wrapper", { v: a.docstring("A comment") });
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        '  """\n' +
+        "  A comment\n" +
+        '  """\n' +
+        "  v: [String]\n" +
         "}\n"
     );
   });
