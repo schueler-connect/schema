@@ -9,8 +9,9 @@ interface Shape {
 }
 declare class SchemaType<T = unknown> {
     p?: T;
-    _docstring?: string;
+    protected _docstring?: string;
     constructor();
+    clone(): SchemaType<T>;
     /**
      * @hidden
      */
@@ -27,10 +28,12 @@ declare class SchemaType<T = unknown> {
      * @hidden
      */
     _reset(): void;
-    docstring(str: string): this;
+    docstring(str: string): SchemaType<T>;
 }
 declare class TrivialSchemaType<T> extends SchemaType<T> {
+    protected gql: string;
     constructor(gql: string);
+    clone(): TrivialSchemaType<T>;
     _render(): string;
     _body(): string;
     /**
@@ -53,6 +56,7 @@ export const id: TrivialSchemaType<TrivialResolver<string | undefined>>;
 declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[]>> {
     inner: SchemaType<T>;
     constructor(gql: string, inner: SchemaType<T>);
+    clone(): ArraySchemaType<T>;
     _body(): string;
     _reset(): void;
 }
@@ -61,6 +65,7 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
     shape: T;
     written: boolean;
     constructor(name: string, shape: T);
+    clone(): InterfaceSchemaType<T>;
     _render(): string;
     _body(): string;
     _reset(): void;
@@ -74,6 +79,7 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
 export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S>>;
 declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>> extends SchemaType<F> {
     constructor(args: Parameters<F>[0], returns: R);
+    clone(): ResolverSchemaType<R, F>;
     _body(): string;
     _render(): string;
     _params(): string;
@@ -85,6 +91,7 @@ declare class Schema<Q extends object = object, M extends object = object> exten
     Mutation: M;
 }> {
     constructor(queries: InterfaceSchemaType<Q>, mutations: InterfaceSchemaType<M>);
+    clone(): Schema<Q, M>;
     toGraphQL(): string;
 }
 export const schema: <Q extends Shape = Shape, M extends Shape = Shape>(queries: Q, mutations: M) => Schema<TypeOfShape<Q>, TypeOfShape<M>>;

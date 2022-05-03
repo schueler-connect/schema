@@ -15,9 +15,13 @@ interface Shape {
 class SchemaType<T = unknown> {
   // Required for type inference
   public p?: T;
-  public _docstring?: string;
+  protected _docstring?: string;
 
   constructor() {}
+
+  clone(): SchemaType<T> {
+    throw "not implemented";
+  }
 
   /**
    * @hidden
@@ -46,14 +50,19 @@ class SchemaType<T = unknown> {
   _reset() {}
 
   docstring(str: string) {
-    this._docstring = str;
-    return this;
+    const t = this.clone();
+    t._docstring = str;
+    return t;
   }
 }
 
 class TrivialSchemaType<T> extends SchemaType<T> {
-  constructor(private gql: string) {
+  constructor(protected gql: string) {
     super();
+  }
+
+  clone() {
+    return new TrivialSchemaType<T>(this.gql);
   }
 
   _render() {
@@ -118,6 +127,10 @@ class ArraySchemaType<T> extends TrivialSchemaType<
     super(gql);
   }
 
+  clone() {
+    return new ArraySchemaType<T>(this.gql, this.inner);
+  }
+
   _body(): string {
     // TODO: Implement
     return this.inner._body();
@@ -136,6 +149,10 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
 
   constructor(private name: string, public shape: T) {
     super();
+  }
+
+  clone() {
+    return new InterfaceSchemaType<T>(this.name, this.shape);
   }
 
   _render() {
@@ -213,6 +230,10 @@ class ResolverSchemaType<
     super();
   }
 
+  clone() {
+    return new ResolverSchemaType<R, F>(this.args, this.returns);
+  }
+
   _body() {
     return Object.values(this.args)
       .concat(this.returns)
@@ -260,6 +281,10 @@ class Schema<
     private mutations: InterfaceSchemaType<M>
   ) {
     super("Schema", { Query: queries.shape, Mutation: mutations.shape });
+  }
+
+  clone() {
+    return new Schema<Q, M>(this.queries, this.mutations);
   }
 
   toGraphQL(): string {
