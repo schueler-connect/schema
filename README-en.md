@@ -118,6 +118,10 @@ const book = $.type("Book", {
 });
 ```
 
+#### Doc comment for type definition
+
+To provide a documentation comment above the definition of the type in the schema, use `.typeDocstring()`. Except for the location in the schema where it generates a comment, it acts the same as [`.docstring()`](#schematypedocstring).
+
 #### Inheritance
 
 Types generated with `$.type` can be extended with `.extend()`.

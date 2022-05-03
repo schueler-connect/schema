@@ -150,12 +150,14 @@ type Common<A, B> = {
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
 class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
+	private _gdocstring: string = "";
+
   constructor(private name: string, public shape: T, public written: SharedBoolean) {
     super();
   }
 
   clone() {
-    return new InterfaceSchemaType<T>(this.name, this.shape, new SharedBoolean(false));
+    return new InterfaceSchemaType<T>(this.name, this.shape, this.written);
   }
 
   _render() {
@@ -166,7 +168,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     if (this.written.inner) return "";
     this.written.inner = true;
     return `${
-      this._docstring ? `"""\n${this._docstring}\n"""\n` : ""
+      this._gdocstring ? `"""\n${this._gdocstring}\n"""\n` : ""
     }type ${this.name.replace("!", "")} {\n${indent(
       Object.entries(this.shape)
         .map(
@@ -217,6 +219,12 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     if (this.name.endsWith("!")) throw "Already non-nullable";
     return new InterfaceSchemaType(this.name + "!", this.shape, this.written) as any;
   }
+
+	typeDocstring(str: string) {
+		const t = this.clone();
+		t._gdocstring = str;
+		return t;
+	}
 }
 
 export const type = <S extends Shape = Shape>(

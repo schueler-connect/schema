@@ -120,6 +120,10 @@ const book = $.type("Book", {
 });
 ```
 
+#### Dokumentationskommentar pro Datentyp
+
+Um über der definition des Datentypen einen Dokumentationskommentar anzuzeigen, verwenden Sie `.typeDocstring()`. Diese Methode verhält sich ansonsten genau wie [`.docstring()`](#schematypedocstring).
+
 #### Erweitern
 
 Typen die mit `$.type` generiert wurden können mit `.extend()` erweitert werden.
