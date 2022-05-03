@@ -61,6 +61,10 @@ declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resol
     _reset(): void;
 }
 export const array: <T>(t: SchemaType<T>) => ArraySchemaType<T>;
+type Common<A, B> = {
+    [P in keyof A & keyof B]: A[P] | B[P];
+};
+type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 declare class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
     shape: T;
     written: boolean;
@@ -72,7 +76,7 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
     /**
      * Create a new type extending this one
      */
-    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<T & TypeOfShape<S>>;
+    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<T, TypeOfShape<S>>>;
     toGraphQL(): string;
     required(): InterfaceSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined>>>;
 }

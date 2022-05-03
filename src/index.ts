@@ -144,6 +144,12 @@ class ArraySchemaType<T> extends TrivialSchemaType<
 export const array = <T>(t: SchemaType<T>) =>
   new ArraySchemaType<T>(`[${t._render()}]`, t);
 
+type Common<A, B> = {
+  [P in keyof A & keyof B]: A[P] | B[P];
+};
+
+type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
+
 class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   written: boolean = false;
 
@@ -189,7 +195,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   extend<S extends Shape = Shape>(
     name: string,
     shape: S
-  ): InterfaceSchemaType<T & TypeOfShape<S>> {
+  ): InterfaceSchemaType<Merge<T, TypeOfShape<S>>> {
     return new InterfaceSchemaType(name, {
       ...this.shape,
       ...shape,
