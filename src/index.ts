@@ -149,7 +149,7 @@ type Common<A, B> = {
 
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
-class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
+class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
 	private _gdocstring: string = "";
 
   constructor(private name: string, public shape: T, public written: SharedBoolean) {
@@ -194,7 +194,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
   extend<S extends Shape = Shape>(
     name: string,
     shape: S
-  ): InterfaceSchemaType<Merge<T, TypeOfShape<S>>> {
+  ): InterfaceSchemaType<Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined> {
     return new InterfaceSchemaType(name, {
       ...this.shape,
       ...shape,
@@ -230,7 +230,7 @@ class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
 export const type = <S extends Shape = Shape>(
   name: string,
   shape: S
-): InterfaceSchemaType<TypeOfShape<S>> =>
+): InterfaceSchemaType<TypeOfShape<S> | undefined> =>
   new InterfaceSchemaType(name, shape, new SharedBoolean(false)) as InterfaceSchemaType<any>;
 
 class ResolverSchemaType<
@@ -317,6 +317,6 @@ export const schema = <Q extends Shape = Shape, M extends Shape = Shape>(
   mutations: M
 ) =>
   new Schema<TypeOfShape<Q>, TypeOfShape<M>>(
-    type("Query", queries),
-    type("Mutation", mutations)
+    type("Query", queries).required(),
+    type("Mutation", mutations).required()
   );

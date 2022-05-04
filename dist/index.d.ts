@@ -68,7 +68,7 @@ type Common<A, B> = {
     [P in keyof A & keyof B]: A[P] | B[P];
 };
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
-declare class InterfaceSchemaType<T extends object = object> extends SchemaType<T> {
+declare class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
     shape: T;
     written: SharedBoolean;
     constructor(name: string, shape: T, written: SharedBoolean);
@@ -79,12 +79,12 @@ declare class InterfaceSchemaType<T extends object = object> extends SchemaType<
     /**
      * Create a new type extending this one
      */
-    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<T, TypeOfShape<S>>>;
+    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined>;
     toGraphQL(): string;
     required(): InterfaceSchemaType<Exclude<T, undefined>>;
     typeDocstring(str: string): InterfaceSchemaType<T>;
 }
-export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S>>;
+export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S> | undefined>;
 declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>> extends SchemaType<F> {
     constructor(args: Parameters<F>[0], returns: R);
     clone(): ResolverSchemaType<R, F>;
