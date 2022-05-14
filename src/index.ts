@@ -13,7 +13,7 @@ interface Shape {
 }
 
 class SharedBoolean {
-	constructor(public inner: boolean) {}
+  constructor(public inner: boolean) {}
 }
 
 export class SchemaType<T = unknown> {
@@ -150,9 +150,13 @@ type Common<A, B> = {
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
 class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
-	private _gdocstring: string = "";
+  private _gdocstring: string = "";
 
-  constructor(private name: string, public shape: T, public written: SharedBoolean) {
+  constructor(
+    private name: string,
+    public shape: T,
+    public written: SharedBoolean
+  ) {
     super();
   }
 
@@ -194,11 +198,17 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
   extend<S extends Shape = Shape>(
     name: string,
     shape: S
-  ): InterfaceSchemaType<Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined> {
-    return new InterfaceSchemaType(name, {
-      ...this.shape,
-      ...shape,
-    }, new SharedBoolean(false)) as InterfaceSchemaType<any>;
+  ): InterfaceSchemaType<
+    Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined
+  > {
+    return new InterfaceSchemaType(
+      name,
+      {
+        ...this.shape,
+        ...shape,
+      },
+      new SharedBoolean(false)
+    ) as InterfaceSchemaType<any>;
   }
 
   toGraphQL() {
@@ -213,25 +223,31 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
     );
   }
 
-  required(): InterfaceSchemaType<
-    Exclude<T, undefined>
-  > {
+  required(): InterfaceSchemaType<Exclude<T, undefined>> {
     if (this.name.endsWith("!")) throw "Already non-nullable";
-    return new InterfaceSchemaType(this.name + "!", this.shape, this.written) as any;
+    return new InterfaceSchemaType(
+      this.name + "!",
+      this.shape,
+      this.written
+    ) as any;
   }
 
-	typeDocstring(str: string) {
-		const t = this.clone();
-		t._gdocstring = str;
-		return t;
-	}
+  typeDocstring(str: string) {
+    const t = this.clone();
+    t._gdocstring = str;
+    return t;
+  }
 }
 
 export const type = <S extends Shape = Shape>(
   name: string,
   shape: S
 ): InterfaceSchemaType<TypeOfShape<S> | undefined> =>
-  new InterfaceSchemaType(name, shape, new SharedBoolean(false)) as InterfaceSchemaType<any>;
+  new InterfaceSchemaType(
+    name,
+    shape,
+    new SharedBoolean(false)
+  ) as InterfaceSchemaType<any>;
 
 class ResolverSchemaType<
   R extends SchemaType,
@@ -257,9 +273,11 @@ class ResolverSchemaType<
   }
 
   _params(): string {
-    return `(${Object.entries(this.args)
-      .map(([k, v]) => `${k}: ${(v as SchemaType)._render()}`)
-      .join(", ")})`;
+    return Object.entries(this.args).length
+      ? `(${Object.entries(this.args)
+          .map(([k, v]) => `${k}: ${(v as SchemaType)._render()}`)
+          .join(", ")})`
+      : "";
   }
 
   _reset() {
@@ -291,7 +309,11 @@ class Schema<
     private queries: InterfaceSchemaType<Q>,
     private mutations: InterfaceSchemaType<M>
   ) {
-    super("Schema", { Query: queries.shape, Mutation: mutations.shape }, new SharedBoolean(false));
+    super(
+      "Schema",
+      { Query: queries.shape, Mutation: mutations.shape },
+      new SharedBoolean(false)
+    );
   }
 
   clone() {

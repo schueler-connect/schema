@@ -554,6 +554,15 @@ describe("$.resolver", () => {
         "}\n"
     );
   });
+
+  test("Without arguments", () => {
+    const r = $.resolver({}, $.int);
+    const w = $.type("Wrapper", {
+      v: r,
+    });
+
+    expect(w.toGraphQL()).toBe("" + "type Wrapper {\n" + "  v: Int\n" + "}\n");
+  });
 });
 
 describe("Schema", () => {
