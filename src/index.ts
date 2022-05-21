@@ -111,7 +111,7 @@ type Resolved<T> = T extends Arguments
   ? T
   : never;
 
-export const bool = new TrivialSchemaType<TrivialResolver<boolean | undefined>>(
+export const boolean = new TrivialSchemaType<TrivialResolver<boolean | undefined>>(
   "Boolean"
 );
 export const int = new TrivialSchemaType<TrivialResolver<number | undefined>>(
@@ -126,6 +126,11 @@ export const string = new TrivialSchemaType<
 export const id = new TrivialSchemaType<TrivialResolver<string | undefined>>(
   "ID"
 );
+
+/**
+ * @deprecated use `$.boolean` instead
+ */
+export const bool = boolean;
 // TODO: export const customScalar = () => {};
 
 class ArraySchemaType<T> extends TrivialSchemaType<
