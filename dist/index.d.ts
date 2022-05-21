@@ -13,7 +13,7 @@ declare class SharedBoolean {
 }
 export class SchemaType<T = unknown> {
     p?: T;
-    protected _docstring?: string;
+    _docstring?: string;
     constructor();
     clone(): SchemaType<T>;
     /**
@@ -36,6 +36,7 @@ export class SchemaType<T = unknown> {
 }
 declare class TrivialSchemaType<T> extends SchemaType<T> {
     protected gql: string;
+    worksInInput: boolean;
     constructor(gql: string, __body?: (() => string) | undefined);
     clone(): TrivialSchemaType<T>;
     _render(): string;
@@ -52,13 +53,18 @@ interface Arguments {
 type Resolved<T> = T extends Arguments ? {
     [K in keyof T]: Resolved<T[K]>;
 } : T extends TrivialResolver<infer T> ? T : never;
-export const bool: TrivialSchemaType<TrivialResolver<boolean | undefined>>;
+export const boolean: TrivialSchemaType<TrivialResolver<boolean | undefined>>;
 export const int: TrivialSchemaType<TrivialResolver<number | undefined>>;
 export const float: TrivialSchemaType<TrivialResolver<number | undefined>>;
 export const string: TrivialSchemaType<TrivialResolver<string | undefined>>;
 export const id: TrivialSchemaType<TrivialResolver<string | undefined>>;
+/**
+ * @deprecated use `$.boolean` instead
+ */
+export const bool: TrivialSchemaType<TrivialResolver<boolean | undefined>>;
 declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[] | undefined>> {
     inner: SchemaType<T>;
+    worksInInput: boolean;
     constructor(gql: string, inner: SchemaType<T>);
     clone(): ArraySchemaType<T>;
     _reset(): void;
@@ -69,8 +75,10 @@ type Common<A, B> = {
 };
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 declare class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
+    protected name: string;
     shape: T;
     written: SharedBoolean;
+    protected _gdocstring: string;
     constructor(name: string, shape: T, written: SharedBoolean);
     clone(): InterfaceSchemaType<T>;
     _render(): string;
@@ -94,6 +102,15 @@ declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) 
     _reset(): void;
 }
 export const resolver: <A extends Shape = Shape, R extends SchemaType<unknown> = SchemaType<unknown>>(args: A, returns: R) => ResolverSchemaType<R, (parent: any, args: Resolved<TypeOfShape<A>>, context: any, info: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>>;
+type InputSchemaField = typeof string | typeof bool | typeof int | typeof float | typeof id | ReturnType<typeof array> | InputSchemaType;
+interface InputShape {
+    [key: string]: InputSchemaField;
+}
+declare class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
+    constructor(name: string, shape: T, written: SharedBoolean);
+    _body(): string;
+}
+export const input: <S extends InputShape = InputShape>(name: string, shape: S) => InputSchemaType<TypeOfShape<S>>;
 declare class Schema<Q extends object = object, M extends object = object> extends InterfaceSchemaType<{
     Query: Q;
     Mutation: M;
