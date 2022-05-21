@@ -352,6 +352,16 @@ class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
       .map((v: SchemaType) => v._body())
       .join("\n")}`;
   }
+
+
+  required(): InputSchemaType<Exclude<T, undefined>> {
+    if (this.name.endsWith("!")) throw "Already non-nullable";
+    return new InputSchemaType(
+      this.name + "!",
+      this.shape,
+      this.written
+    ) as any;
+  }
 }
 
 export const input = <S extends InputShape = InputShape>(

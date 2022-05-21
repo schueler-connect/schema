@@ -110,6 +110,7 @@ interface InputShape {
 declare class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
     constructor(name: string, shape: T, written: SharedBoolean);
     _body(): string;
+    required(): InputSchemaType<Exclude<T, undefined>>;
 }
 export const input: <S extends InputShape = InputShape>(name: string, shape: S) => InputSchemaType<TypeOfShape<S>>;
 declare class Schema<Q extends object = object, M extends object = object> extends InterfaceSchemaType<{
