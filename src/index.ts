@@ -315,11 +315,7 @@ export const resolver = <
 > => new ResolverSchemaType(args, returns) as ResolverSchemaType<any, any>;
 
 type InputSchemaField =
-  | typeof string
-  | typeof bool
-  | typeof int
-  | typeof float
-  | typeof id
+  | TrivialSchemaType<any>
   | ReturnType<typeof array>
   | InputSchemaType;
 
