@@ -102,7 +102,7 @@ declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) 
     _reset(): void;
 }
 export const resolver: <A extends Shape = Shape, R extends SchemaType<unknown> = SchemaType<unknown>>(args: A, returns: R) => ResolverSchemaType<R, (parent: any, args: Resolved<TypeOfShape<A>>, context: any, info: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>>;
-type InputSchemaField = typeof string | typeof bool | typeof int | typeof float | typeof id | ReturnType<typeof array> | InputSchemaType;
+type InputSchemaField = TrivialSchemaType<any> | ReturnType<typeof array> | InputSchemaType;
 interface InputShape {
     [key: string]: InputSchemaField;
 }
