@@ -92,6 +92,12 @@ class TrivialSchemaType<T> extends SchemaType<T> {
       TrivialResolver<Exclude<Resolved<T>, undefined>>
     >(this.gql + "!", this.__body);
   }
+
+  docstring(str: string) {
+    const t = this.clone();
+    t._docstring = str;
+    return t;
+  }
 }
 
 const indent = (s: string) =>

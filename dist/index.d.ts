@@ -45,6 +45,7 @@ declare class TrivialSchemaType<T> extends SchemaType<T> {
      * Define type to be non-nullable
      */
     required(): TrivialSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined>>>;
+    docstring(str: string): TrivialSchemaType<T>;
 }
 type TrivialResolver<T = unknown> = T | ((...args: any) => T | Promise<T>);
 interface Arguments {
