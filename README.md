@@ -13,7 +13,7 @@
 
 🌎 Deutsch | [English](README-en.md)
 
-`@schuelerconnect/schema` ist eine leichte (4kb) package, die es erlaubt, einfach und ohne redundanz typensichere GraphQL-Schemen zu schreiben:
+`@schuelerconnect/schema` ist eine leichte (~4kb) package, die es erlaubt, einfach und ohne redundanz typensichere GraphQL-Schemen zu schreiben:
 
 ```ts
 import * as $ from "@schuelerconnect/schema";
