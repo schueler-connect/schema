@@ -1,6 +1,6 @@
 {
   "name": "@schuelerconnect/schema",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Easily write strongly typed GraphQL schemas as code",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
