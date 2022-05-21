@@ -19,7 +19,7 @@ class SharedBoolean {
 export class SchemaType<T = unknown> {
   // Required for type inference
   public p?: T;
-  protected _docstring?: string;
+  public _docstring?: string;
 
   constructor() {}
 
@@ -61,6 +61,10 @@ export class SchemaType<T = unknown> {
 }
 
 class TrivialSchemaType<T> extends SchemaType<T> {
+  // To avoid duck-typing when deciding whether a type
+  // can be used inside an input type
+  public worksInInput = true;
+
   constructor(protected gql: string, private __body?: () => string) {
     super();
   }
@@ -127,6 +131,10 @@ export const id = new TrivialSchemaType<TrivialResolver<string | undefined>>(
 class ArraySchemaType<T> extends TrivialSchemaType<
   TrivialResolver<Resolved<T>[] | undefined>
 > {
+  // To avoid duck-typing when deciding whether a type
+  // can be used inside an input type
+  public worksInInput = true;
+
   constructor(gql: string, public inner: SchemaType<T>) {
     super(gql, () => inner._body());
   }
@@ -150,10 +158,10 @@ type Common<A, B> = {
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
 class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
-  private _gdocstring: string = "";
+  protected _gdocstring: string = "";
 
   constructor(
-    private name: string,
+    protected name: string,
     public shape: T,
     public written: SharedBoolean
   ) {
@@ -300,6 +308,50 @@ export const resolver = <
     info: any
   ) => TypeOfShape<R> | Promise<TypeOfShape<R>>
 > => new ResolverSchemaType(args, returns) as ResolverSchemaType<any, any>;
+
+type InputSchemaField =
+  | typeof string
+  | typeof bool
+  | typeof int
+  | typeof float
+  | typeof id
+  | ReturnType<typeof array>
+  | InputSchemaType;
+
+interface InputShape {
+  [key: string]: InputSchemaField;
+}
+
+class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
+  constructor(name: string, shape: T, written: SharedBoolean) {
+    super(name, shape, written);
+  }
+
+  _body(): string {
+    if (this.written.inner) return "";
+    this.written.inner = true;
+    return `${
+      this._gdocstring ? `"""\n${this._gdocstring}\n"""\n` : ""
+    }input ${this.name.replace("!", "")} {\n${indent(
+      Object.entries(this.shape)
+        .map(
+          ([k, v]) =>
+            `${
+              v._docstring ? `"""\n${v._docstring}\n"""\n` : ""
+            }${k}${v._params()}: ${v._render()}`
+        )
+        .join(",\n")
+    )}\n}\n\n${Object.values(this.shape)
+      .map((v: SchemaType) => v._body())
+      .join("\n")}`;
+  }
+}
+
+export const input = <S extends InputShape = InputShape>(
+  name: string,
+  shape: S
+): InputSchemaType<TypeOfShape<S>> =>
+  new InputSchemaType(name, shape, new SharedBoolean(false))as InterfaceSchemaType<any>;
 
 class Schema<
   Q extends object = object,

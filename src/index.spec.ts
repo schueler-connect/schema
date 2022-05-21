@@ -565,6 +565,39 @@ describe("$.resolver", () => {
   });
 });
 
+describe("$.input", () => {
+  test("Input type", () => {
+    const i = $.input("Input", {
+      aField: $.string,
+      aNumber: $.int,
+      aBoolean: $.bool.required(),
+    });
+
+    type expectI = {
+      aField:
+        | string
+        | undefined
+        | ((...args: any) => string | undefined | Promise<string | undefined>);
+      aNumber:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+      aBoolean: boolean | ((...args: any) => boolean | Promise<boolean>);
+    };
+
+    expectType<expectI>({} as $.Infer<typeof i>);
+
+    expect(i.toGraphQL()).toBe(
+      "" +
+        "input Input {\n" +
+        "  aField: String,\n" +
+        "  aNumber: Int,\n" +
+        "  aBoolean: Boolean!\n" +
+        "}\n"
+    );
+  });
+});
+
 describe("Schema", () => {
   test("Simple schema", () => {
     const s = $.schema(
