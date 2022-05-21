@@ -227,6 +227,7 @@ const meineResolver: schemaDatentypen = {
 ## Bekannte Mängel
 
 - `union`s werden nicht unterstützt
+- `enum`s werden nicht unterstützt
 - Eigene scalar-datentypen werden nicht unterstützt
 
 <div align="center">
