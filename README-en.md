@@ -25,7 +25,7 @@ const mySchema = $.schema(
 	},
 	// mutations
 	{
-		setCounter: $.resolver({ value: $.int.required() }, $.bool),
+		setCounter: $.resolver({ value: $.int.required() }, $.boolean),
 	}
 );
 
@@ -58,7 +58,7 @@ Built-in datatypes:
 
 - `int` (GraphQL: `Int`) – Integer
 - `float` (GraphQL: `Float`) – Float-ing point number
-- `bool` (GraphQL: `Boolean`) – Boolean value
+- `boolean` (GraphQL: `Boolean`) – Boolean value
 - `string` (GraphQL: `String`) – String
 - `id` (GraphQL: `ID`) – Not human-readable string
 
@@ -180,7 +180,7 @@ Example:
 //   abc(xyz: String): Boolean
 // }
 $.type("A", {
-	abc: $.resolver({ xyz: $.string }, $.bool),
+	abc: $.resolver({ xyz: $.string }, $.boolean),
 });
 ```
 

@@ -25,7 +25,7 @@ const meinSchema = $.schema(
 	},
 	// mutationen
 	{
-		zaehlerSetzen: $.resolver({ zahl: $.int.required() }, $.bool),
+		zaehlerSetzen: $.resolver({ zahl: $.int.required() }, $.boolean),
 	}
 );
 
@@ -59,7 +59,7 @@ Eingebaute datentypen:
 
 - `int` (GraphQL: `Int`) – Ganzahl
 - `float` (GraphQL: `Float`) – Dezimalzahl
-- `bool` (GraphQL: `Boolean`) – Boole'scher wert
+- `boolean` (GraphQL: `Boolean`) – Boole'scher wert
 - `string` (GraphQL: `String`) – Zeichenkette
 - `id` (GraphQL: `ID`) – Nicht für Menschen lesbare Zeichenkette
 
@@ -184,7 +184,7 @@ Beispiel:
 //   abc(xyz: String): Boolean
 // }
 $.type("A", {
-	abc: $.resolver({ xyz: $.string }, $.bool),
+	abc: $.resolver({ xyz: $.string }, $.boolean),
 });
 ```
 
