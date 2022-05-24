@@ -76,7 +76,7 @@ type Common<A, B> = {
 };
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 declare class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
-    protected name: string;
+    protected readonly name: string;
     shape: T;
     written: SharedBoolean;
     protected _gdocstring: string;

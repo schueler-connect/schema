@@ -117,9 +117,9 @@ type Resolved<T> = T extends Arguments
   ? T
   : never;
 
-export const boolean = new TrivialSchemaType<TrivialResolver<boolean | undefined>>(
-  "Boolean"
-);
+export const boolean = new TrivialSchemaType<
+  TrivialResolver<boolean | undefined>
+>("Boolean");
 export const int = new TrivialSchemaType<TrivialResolver<number | undefined>>(
   "Int"
 );
@@ -172,7 +172,7 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
   protected _gdocstring: string = "";
 
   constructor(
-    protected name: string,
+    protected readonly name: string,
     public shape: T,
     public written: SharedBoolean
   ) {
@@ -353,7 +353,6 @@ class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
       .join("\n")}`;
   }
 
-
   required(): InputSchemaType<Exclude<T, undefined>> {
     if (this.name.endsWith("!")) throw "Already non-nullable";
     return new InputSchemaType(
@@ -368,7 +367,11 @@ export const input = <S extends InputShape = InputShape>(
   name: string,
   shape: S
 ): InputSchemaType<TypeOfShape<S>> =>
-  new InputSchemaType(name, shape, new SharedBoolean(false))as InterfaceSchemaType<any>;
+  new InputSchemaType(
+    name,
+    shape,
+    new SharedBoolean(false)
+  ) as InterfaceSchemaType<any>;
 
 class Schema<
   Q extends object = object,
