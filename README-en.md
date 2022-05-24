@@ -224,6 +224,7 @@ const myResolvers: schemaTypings = {
 
 - `union`s are currently not supported
 - `enum`s are currently not supported
+- Typings for resolvers for types other than `Query` and `Mutation` aren't supported (see [#3](https://github.com/schueler-connect/schema/issues/3))
 - Custom scalars are not supported
 
 <div align="center">
