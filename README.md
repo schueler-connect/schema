@@ -228,7 +228,6 @@ const meineResolver: schemaDatentypen = {
 
 - `union`s werden nicht unterstützt
 - `enum`s werden nicht unterstützt
-- Datentypen für resolver für datentypen außer `Query` und `Mutation` nicht unterstützt (siehe [#3](https://github.com/schueler-connect/schema/issues/3))
 - Eigene scalar-datentypen werden nicht unterstützt
 
 <div align="center">
