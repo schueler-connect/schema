@@ -19,18 +19,18 @@
 import * as $ from "@schuelerconnect/schema";
 
 const mySchema = $.schema(
-	// queries
-	{
-		counter: $.int
-	},
-	// mutations
-	{
-		setCounter: $.resolver({ value: $.int.required() }, $.boolean),
-	}
+  // queries
+  {
+    counter: $.int
+  },
+  // mutations
+  {
+    setCounter: $.resolver({ value: $.int.required() }, $.boolean),
+  }
 );
 
 const myResolvers: $.Infer<typeof mySchema> = {
-	// ...
+  // ...
 };
 
 // type Query {
@@ -112,9 +112,9 @@ Examples:
 //   year: Int
 // }
 const book = $.type("Book", {
-	name: $.string,
-	author: $.string,
-	year: $.int,
+  name: $.string,
+  author: $.string,
+  year: $.int,
 });
 ```
 
@@ -180,7 +180,7 @@ Example:
 //   abc(xyz: String): Boolean
 // }
 $.type("A", {
-	abc: $.resolver({ xyz: $.string }, $.boolean),
+  abc: $.resolver({ xyz: $.string }, $.boolean),
 });
 ```
 
@@ -194,7 +194,7 @@ Parameters:
 
 ```ts
 $.schema({
-	test: $.string.docstring("test test");
+  test: $.string.docstring("test test");
 }, {});
 
 // type Query {
@@ -216,7 +216,7 @@ const mySchema = $.schema(/* ... */);
 type schemaTypings = $.Infer<typeof mySchema>;
 
 const myResolvers: schemaTypings = {
-	// ...
+  // ...
 };
 ```
 
