@@ -39,6 +39,17 @@ describe("$.{type}", () => {
         "}\n"
     );
   });
+
+  // test("Non-required value", () => {
+  //   const t = $.string;
+  //   expectType<
+  //     | string
+  //     | undefined
+  //     | (() => string | undefined | Promise<string | undefined>)
+  //   >("" as $.Infer<typeof t>);
+
+	// 	let _: $.Infer<typeof t> = undefined;
+  // });
 });
 
 describe("$.type", () => {
@@ -74,7 +85,7 @@ describe("$.type", () => {
         | string
         | undefined
         | ((...args: any) => string | undefined | Promise<string | undefined>);
-    }>({} as $.Infer<typeof t>);
+    } | undefined>({} as $.Infer<typeof t>);
 
     expect(t.toGraphQL()).toBe(
       "" +
@@ -103,7 +114,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    }>({} as $.Infer<typeof t>);
+    } | undefined>({} as $.Infer<typeof t>);
 
     expect(t.toGraphQL()).toBe(
       "" +
@@ -132,7 +143,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    };
+    } | undefined;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const p = $.type("Parent", {
@@ -153,7 +164,7 @@ describe("$.type", () => {
         | number
         | undefined
         | ((...args: any) => number | undefined | Promise<number | undefined>);
-    }>({} as $.Infer<typeof p>);
+    } | undefined>({} as $.Infer<typeof p>);
 
     expect(p.toGraphQL()).toBe(
       "" +
@@ -188,7 +199,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    };
+    } | undefined;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const p = $.type("Parent", {
@@ -209,7 +220,7 @@ describe("$.type", () => {
         | number
         | undefined
         | ((...args: any) => number | undefined | Promise<number | undefined>);
-    };
+    } | undefined;
     expectType<expectP>({} as $.Infer<typeof p>);
 
     const g = $.type("Grandparent", {
@@ -229,7 +240,7 @@ describe("$.type", () => {
         | number
         | undefined
         | ((...args: any) => number | undefined | Promise<number | undefined>);
-    }>({} as $.Infer<typeof g>);
+    } | undefined>({} as $.Infer<typeof g>);
 
     expect(g.toGraphQL()).toBe(
       "" +
@@ -270,7 +281,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    };
+    } | undefined;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const e = t.extend("Extended", {
@@ -290,7 +301,7 @@ describe("$.type", () => {
         | string
         | undefined
         | ((...args: any) => string | undefined | Promise<string | undefined>);
-    }>({} as $.Infer<typeof e>);
+    } | undefined>({} as $.Infer<typeof e>);
 
     expect(e.toGraphQL()).toBe(
       "" +
@@ -369,7 +380,7 @@ describe("$.array", () => {
         | ((
             ...args: any
           ) => (string | undefined)[] | Promise<(string | undefined)[]>);
-    }>({} as $.Infer<typeof w>);
+    } | undefined>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" + "type Wrapper {\n" + "  v: [String]!\n" + "}\n"
@@ -404,7 +415,7 @@ describe("$.array", () => {
             | ({ x: number } | undefined)[]
             | undefined
             | Promise<({ x: number } | undefined)[] | undefined>);
-    }>({} as $.Infer<typeof w>);
+    } | undefined>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -444,7 +455,7 @@ describe("$.array", () => {
           ) =>
             | ({ x: number } | undefined)[]
             | Promise<({ x: number } | undefined)[]>);
-    }>({} as $.Infer<typeof w>);
+    } | undefined>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -493,7 +504,7 @@ describe("$.resolver", () => {
         | number
         | undefined
         | ((...args: any) => number | undefined | Promise<number | undefined>);
-    };
+    } | undefined;
     expectType<expectI>({} as $.Infer<typeof i>);
 
     const r = $.resolver({ anumber: $.int, astring: $.string, i: i }, i);
@@ -523,12 +534,105 @@ describe("$.resolver", () => {
                 ...args: any
               ) => expectI | undefined | Promise<expectI | undefined>)
           >;
-    }>({} as $.Infer<typeof w>);
+    } | undefined>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
         "type Wrapper {\n" +
         "  v(anumber: Int, astring: String, i: I): I\n" +
+        "}\n" +
+        "\n" +
+        "type I {\n" +
+        "  a: Int!,\n" +
+        "  b: Float\n" +
+        "}\n"
+    );
+  });
+
+  test("Required return value", () => {
+    const i = $.type("I", {
+      a: $.int.required(),
+      b: $.float,
+    });
+
+    type expectI = {
+      a: number | ((...args: any) => number | Promise<number>);
+      b:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    };
+
+    const r = $.resolver({ astring: $.string }, i.required());
+
+    const w = $.type("Wrapper", {
+      v: r,
+    });
+
+    expectType<{
+      v: (
+        parent: any,
+        args: { astring: string | undefined },
+        ctx: any,
+        info: any
+      ) =>
+        | expectI
+        | ((...args: any) => expectI | Promise<expectI>)
+        | Promise<expectI | ((...args: any) => expectI | Promise<expectI>)>;
+    } | undefined>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        "  v(astring: String): I!\n" +
+        "}\n" +
+        "\n" +
+        "type I {\n" +
+        "  a: Int!,\n" +
+        "  b: Float\n" +
+        "}\n"
+    );
+  });
+
+  test("Required return value and docstring", () => {
+    const i = $.type("I", {
+      a: $.int.required(),
+      b: $.float,
+    });
+
+    type expectI = {
+      a: number | ((...args: any) => number | Promise<number>);
+      b:
+        | number
+        | undefined
+        | ((...args: any) => number | undefined | Promise<number | undefined>);
+    };
+
+    const r = $.resolver({ astring: $.string }, i.required());
+
+    const w = $.type("Wrapper", {
+      v: r.docstring("test"),
+    });
+
+    expectType<{
+      v: (
+        parent: any,
+        args: { astring: string | undefined },
+        ctx: any,
+        info: any
+      ) =>
+        | expectI
+        | ((...args: any) => expectI | Promise<expectI>)
+        | Promise<expectI | ((...args: any) => expectI | Promise<expectI>)>;
+    } | undefined>({} as $.Infer<typeof w>);
+
+    expect(w.toGraphQL()).toBe(
+      "" +
+        "type Wrapper {\n" +
+        '  """\n' +
+        "  test\n" +
+        '  """\n' +
+        "  v(astring: String): I!\n" +
         "}\n" +
         "\n" +
         "type I {\n" +
@@ -597,7 +701,7 @@ describe("$.input", () => {
     );
   });
 
-	test("Required input type", () => {
+  test("Required input type", () => {
     const i = $.input("Input", {
       aField: $.string,
       aNumber: $.int,

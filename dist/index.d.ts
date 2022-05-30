@@ -1,6 +1,4 @@
-export type Infer<S> = S extends SchemaType<infer X> ? X & {
-    [key: string]: any;
-} : never;
+export type Infer<S> = S extends SchemaType<infer X> ? X : never;
 type TypeOfShape<S extends SchemaType | Shape> = S extends SchemaType<infer X> ? X : S extends Shape ? {
     [K in keyof S]: TypeOfShape<S[K]>;
 } : never;

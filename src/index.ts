@@ -1,5 +1,5 @@
 export type Infer<S> = S extends SchemaType<infer X>
-  ? X & { [key: string]: any }
+  ? X
   : never;
 
 type TypeOfShape<S extends SchemaType | Shape> = S extends SchemaType<infer X>
@@ -132,6 +132,8 @@ export const string = new TrivialSchemaType<
 export const id = new TrivialSchemaType<TrivialResolver<string | undefined>>(
   "ID"
 );
+
+type t = Infer<typeof string>;
 
 /**
  * @deprecated use `$.boolean` instead
