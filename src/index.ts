@@ -85,11 +85,11 @@ class TrivialSchemaType<T> extends SchemaType<T> {
    * Define type to be non-nullable
    */
   required(): TrivialSchemaType<
-    TrivialResolver<Exclude<Resolved<T>, undefined>>
+    TrivialResolver<Exclude<Resolved<T>, undefined | null>>
   > {
     if (this.gql.endsWith("!")) throw "Already non-nullable";
     return new TrivialSchemaType<
-      TrivialResolver<Exclude<Resolved<T>, undefined>>
+      TrivialResolver<Exclude<Resolved<T>, undefined | null>>
     >(this.gql + "!", this.__body);
   }
 
@@ -118,22 +118,20 @@ type Resolved<T> = T extends Arguments
   : never;
 
 export const boolean = new TrivialSchemaType<
-  TrivialResolver<boolean | undefined>
+  TrivialResolver<boolean | undefined | null>
 >("Boolean");
-export const int = new TrivialSchemaType<TrivialResolver<number | undefined>>(
+export const int = new TrivialSchemaType<TrivialResolver<number | undefined | null>>(
   "Int"
 );
-export const float = new TrivialSchemaType<TrivialResolver<number | undefined>>(
+export const float = new TrivialSchemaType<TrivialResolver<number | undefined | null>>(
   "Float"
 );
 export const string = new TrivialSchemaType<
-  TrivialResolver<string | undefined>
+  TrivialResolver<string | undefined | null>
 >("String");
-export const id = new TrivialSchemaType<TrivialResolver<string | undefined>>(
+export const id = new TrivialSchemaType<TrivialResolver<string | undefined | null>>(
   "ID"
 );
-
-type t = Infer<typeof string>;
 
 /**
  * @deprecated use `$.boolean` instead
@@ -142,7 +140,7 @@ export const bool = boolean;
 // TODO: export const customScalar = () => {};
 
 class ArraySchemaType<T> extends TrivialSchemaType<
-  TrivialResolver<Resolved<T>[] | undefined>
+  TrivialResolver<Resolved<T>[] | undefined | null>
 > {
   // To avoid duck-typing when deciding whether a type
   // can be used inside an input type
@@ -170,7 +168,7 @@ type Common<A, B> = {
 
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
-class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
+class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
   protected _gdocstring: string = "";
 
   constructor(
@@ -220,7 +218,7 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
     name: string,
     shape: S
   ): InterfaceSchemaType<
-    Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined
+    Merge<Exclude<T, undefined | null>, TypeOfShape<S>> | undefined | null
   > {
     return new InterfaceSchemaType(
       name,
@@ -244,7 +242,7 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
     );
   }
 
-  required(): InterfaceSchemaType<Exclude<T, undefined>> {
+  required(): InterfaceSchemaType<Exclude<T, undefined | null>> {
     if (this.name.endsWith("!")) throw "Already non-nullable";
     return new InterfaceSchemaType(
       this.name + "!",
@@ -263,7 +261,7 @@ class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
 export const type = <S extends Shape = Shape>(
   name: string,
   shape: S
-): InterfaceSchemaType<TypeOfShape<S> | undefined> =>
+): InterfaceSchemaType<TypeOfShape<S> | undefined | null> =>
   new InterfaceSchemaType(
     name,
     shape,
@@ -331,7 +329,7 @@ interface InputShape {
   [key: string]: InputSchemaField;
 }
 
-class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
+class InputSchemaType<T = object | undefined | null> extends InterfaceSchemaType<T> {
   constructor(name: string, shape: T, written: SharedBoolean) {
     super(name, shape, written);
   }
@@ -355,7 +353,7 @@ class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
       .join("\n")}`;
   }
 
-  required(): InputSchemaType<Exclude<T, undefined>> {
+  required(): InputSchemaType<Exclude<T, undefined | null>> {
     if (this.name.endsWith("!")) throw "Already non-nullable";
     return new InputSchemaType(
       this.name + "!",
@@ -416,3 +414,9 @@ export const schema = <Q extends Shape = Shape, M extends Shape = Shape>(
     type("Query", queries).required(),
     type("Mutation", mutations).required()
   );
+
+const a = type('A', {
+	s: string
+});
+
+type t = Infer<typeof a>;

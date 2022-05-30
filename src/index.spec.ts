@@ -65,27 +65,27 @@ describe("$.type", () => {
     expectType<{
       aninteger:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
       afloat:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
       abool:
         | boolean
-        | undefined
+        | undefined | null
         | ((
             ...args: any
-          ) => boolean | undefined | Promise<boolean | undefined>);
+          ) => boolean | undefined | null | Promise<boolean | undefined | null>);
       astring:
         | string
-        | undefined
-        | ((...args: any) => string | undefined | Promise<string | undefined>);
+        | undefined | null
+        | ((...args: any) => string | undefined | null | Promise<string | undefined | null>);
       anid:
         | string
-        | undefined
-        | ((...args: any) => string | undefined | Promise<string | undefined>);
-    } | undefined>({} as $.Infer<typeof t>);
+        | undefined | null
+        | ((...args: any) => string | undefined | null | Promise<string | undefined | null>);
+    } | undefined | null>({} as $.Infer<typeof t>);
 
     expect(t.toGraphQL()).toBe(
       "" +
@@ -114,7 +114,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    } | undefined>({} as $.Infer<typeof t>);
+    } | undefined | null>({} as $.Infer<typeof t>);
 
     expect(t.toGraphQL()).toBe(
       "" +
@@ -143,7 +143,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    } | undefined;
+    } | undefined | null;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const p = $.type("Parent", {
@@ -156,15 +156,15 @@ describe("$.type", () => {
       reqchild: expectT | ((...args: any) => expectT | Promise<expectT>);
       child:
         | expectT
-        | undefined
+        | undefined | null
         | ((
             ...args: any
-          ) => expectT | undefined | Promise<expectT | undefined>);
+          ) => expectT | undefined | null | Promise<expectT | undefined | null>);
       x:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
-    } | undefined>({} as $.Infer<typeof p>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
+    } | undefined | null>({} as $.Infer<typeof p>);
 
     expect(p.toGraphQL()).toBe(
       "" +
@@ -199,7 +199,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    } | undefined;
+    } | undefined | null;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const p = $.type("Parent", {
@@ -212,15 +212,15 @@ describe("$.type", () => {
       reqchild: expectT | ((...args: any) => expectT | Promise<expectT>);
       child:
         | expectT
-        | undefined
+        | undefined | null
         | ((
             ...args: any
-          ) => expectT | undefined | Promise<expectT | undefined>);
+          ) => expectT | undefined | null | Promise<expectT | undefined | null>);
       x:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
-    } | undefined;
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
+    } | undefined | null;
     expectType<expectP>({} as $.Infer<typeof p>);
 
     const g = $.type("Grandparent", {
@@ -232,15 +232,15 @@ describe("$.type", () => {
       reqchild: expectP | ((...args: any) => expectP | Promise<expectP>);
       child:
         | expectP
-        | undefined
+        | undefined | null
         | ((
             ...args: any
-          ) => expectP | undefined | Promise<expectP | undefined>);
+          ) => expectP | undefined | null | Promise<expectP | undefined | null>);
       x:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
-    } | undefined>({} as $.Infer<typeof g>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
+    } | undefined | null>({} as $.Infer<typeof g>);
 
     expect(g.toGraphQL()).toBe(
       "" +
@@ -281,7 +281,7 @@ describe("$.type", () => {
       abool: boolean | ((...args: any) => boolean | Promise<boolean>);
       astring: string | ((...args: any) => string | Promise<string>);
       anid: string | ((...args: any) => string | Promise<string>);
-    } | undefined;
+    } | undefined | null;
     expectType<expectT>({} as $.Infer<typeof t>);
 
     const e = t.extend("Extended", {
@@ -299,9 +299,9 @@ describe("$.type", () => {
       anid: string | ((...args: any) => string | Promise<string>);
       anotherid:
         | string
-        | undefined
-        | ((...args: any) => string | undefined | Promise<string | undefined>);
-    } | undefined>({} as $.Infer<typeof e>);
+        | undefined | null
+        | ((...args: any) => string | undefined | null | Promise<string | undefined | null>);
+    } | undefined | null>({} as $.Infer<typeof e>);
 
     expect(e.toGraphQL()).toBe(
       "" +
@@ -360,14 +360,14 @@ describe("$.array", () => {
     const a = $.array($.string);
 
     expectType<
-      | (string | undefined)[]
-      | undefined
+      | (string | undefined | null)[]
+      | undefined | null
       | ((
           ...args: any
         ) =>
-          | (string | undefined)[]
-          | undefined
-          | Promise<(string | undefined)[] | undefined>)
+          | (string | undefined | null)[]
+          | undefined | null
+          | Promise<(string | undefined | null)[] | undefined | null>)
     >([] as $.Infer<typeof a>);
 
     const w = $.type("Wrapper", {
@@ -376,11 +376,11 @@ describe("$.array", () => {
 
     expectType<{
       v:
-        | (string | undefined)[]
+        | (string | undefined | null)[]
         | ((
             ...args: any
-          ) => (string | undefined)[] | Promise<(string | undefined)[]>);
-    } | undefined>({} as $.Infer<typeof w>);
+          ) => (string | undefined | null)[] | Promise<(string | undefined | null)[]>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" + "type Wrapper {\n" + "  v: [String]!\n" + "}\n"
@@ -391,14 +391,14 @@ describe("$.array", () => {
     const a = $.array($.type("X", { x: $.int.required() }));
 
     expectType<
-      | ({ x: number } | undefined)[]
-      | undefined
+      | ({ x: number } | undefined | null)[]
+      | undefined | null
       | ((
           ...args: any
         ) =>
-          | ({ x: number } | undefined)[]
-          | undefined
-          | Promise<({ x: number } | undefined)[] | undefined>)
+          | ({ x: number } | undefined | null)[]
+          | undefined | null
+          | Promise<({ x: number } | undefined | null)[] | undefined | null>)
     >([] as $.Infer<typeof a>);
 
     const w = $.type("Wrapper", {
@@ -407,15 +407,15 @@ describe("$.array", () => {
 
     expectType<{
       v:
-        | ({ x: number } | undefined)[]
-        | undefined
+        | ({ x: number } | undefined | null)[]
+        | undefined | null
         | ((
             ...args: any
           ) =>
-            | ({ x: number } | undefined)[]
-            | undefined
-            | Promise<({ x: number } | undefined)[] | undefined>);
-    } | undefined>({} as $.Infer<typeof w>);
+            | ({ x: number } | undefined | null)[]
+            | undefined | null
+            | Promise<({ x: number } | undefined | null)[] | undefined | null>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -433,14 +433,14 @@ describe("$.array", () => {
     const a = $.array($.type("X", { x: $.int.required() }));
 
     expectType<
-      | ({ x: number } | undefined)[]
-      | undefined
+      | ({ x: number } | undefined | null)[]
+      | undefined | null
       | ((
           ...args: any
         ) =>
-          | ({ x: number } | undefined)[]
-          | undefined
-          | Promise<({ x: number } | undefined)[] | undefined>)
+          | ({ x: number } | undefined | null)[]
+          | undefined | null
+          | Promise<({ x: number } | undefined | null)[] | undefined | null>)
     >([] as $.Infer<typeof a>);
 
     const w = $.type("Wrapper", {
@@ -449,13 +449,13 @@ describe("$.array", () => {
 
     expectType<{
       v:
-        | ({ x: number } | undefined)[]
+        | ({ x: number } | undefined | null)[]
         | ((
             ...args: any
           ) =>
-            | ({ x: number } | undefined)[]
-            | Promise<({ x: number } | undefined)[]>);
-    } | undefined>({} as $.Infer<typeof w>);
+            | ({ x: number } | undefined | null)[]
+            | Promise<({ x: number } | undefined | null)[]>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -502,9 +502,9 @@ describe("$.resolver", () => {
       a: number | ((...args: any) => number | Promise<number>);
       b:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
-    } | undefined;
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
+    } | undefined | null;
     expectType<expectI>({} as $.Infer<typeof i>);
 
     const r = $.resolver({ anumber: $.int, astring: $.string, i: i }, i);
@@ -517,24 +517,24 @@ describe("$.resolver", () => {
       v: (
         parent: any,
         args: {
-          anumber: number | undefined;
-          astring: string | undefined;
-          i: { a: number; b: number | undefined };
+          anumber: number | undefined | null;
+          astring: string | undefined | null;
+          i: { a: number; b: number | undefined | null };
         },
         ctx: any,
         info: any
       ) =>
         | expectI
-        | undefined
-        | ((...args: any) => expectI | undefined | Promise<expectI | undefined>)
+        | undefined | null
+        | ((...args: any) => expectI | undefined | null | Promise<expectI | undefined | null>)
         | Promise<
             | expectI
-            | undefined
+            | undefined | null
             | ((
                 ...args: any
-              ) => expectI | undefined | Promise<expectI | undefined>)
+              ) => expectI | undefined | null | Promise<expectI | undefined | null>)
           >;
-    } | undefined>({} as $.Infer<typeof w>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -559,8 +559,8 @@ describe("$.resolver", () => {
       a: number | ((...args: any) => number | Promise<number>);
       b:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
     };
 
     const r = $.resolver({ astring: $.string }, i.required());
@@ -572,14 +572,14 @@ describe("$.resolver", () => {
     expectType<{
       v: (
         parent: any,
-        args: { astring: string | undefined },
+        args: { astring: string | undefined | null },
         ctx: any,
         info: any
       ) =>
         | expectI
         | ((...args: any) => expectI | Promise<expectI>)
         | Promise<expectI | ((...args: any) => expectI | Promise<expectI>)>;
-    } | undefined>({} as $.Infer<typeof w>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -604,8 +604,8 @@ describe("$.resolver", () => {
       a: number | ((...args: any) => number | Promise<number>);
       b:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
     };
 
     const r = $.resolver({ astring: $.string }, i.required());
@@ -617,14 +617,14 @@ describe("$.resolver", () => {
     expectType<{
       v: (
         parent: any,
-        args: { astring: string | undefined },
+        args: { astring: string | undefined | null },
         ctx: any,
         info: any
       ) =>
         | expectI
         | ((...args: any) => expectI | Promise<expectI>)
         | Promise<expectI | ((...args: any) => expectI | Promise<expectI>)>;
-    } | undefined>({} as $.Infer<typeof w>);
+    } | undefined | null>({} as $.Infer<typeof w>);
 
     expect(w.toGraphQL()).toBe(
       "" +
@@ -680,12 +680,12 @@ describe("$.input", () => {
     type expectI = {
       aField:
         | string
-        | undefined
-        | ((...args: any) => string | undefined | Promise<string | undefined>);
+        | undefined | null
+        | ((...args: any) => string | undefined | null | Promise<string | undefined | null>);
       aNumber:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
       aBoolean: boolean | ((...args: any) => boolean | Promise<boolean>);
     };
 
@@ -711,12 +711,12 @@ describe("$.input", () => {
     type expectI = {
       aField:
         | string
-        | undefined
-        | ((...args: any) => string | undefined | Promise<string | undefined>);
+        | undefined | null
+        | ((...args: any) => string | undefined | null | Promise<string | undefined | null>);
       aNumber:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
       aBoolean: boolean | ((...args: any) => boolean | Promise<boolean>);
     };
 
@@ -756,8 +756,8 @@ describe("Schema", () => {
     type expectS = {
       mostRecentChange:
         | number
-        | undefined
-        | ((...args: any) => number | undefined | Promise<number | undefined>);
+        | undefined | null
+        | ((...args: any) => number | undefined | null | Promise<number | undefined | null>);
     };
 
     expectType<{
@@ -773,16 +773,16 @@ describe("Schema", () => {
           info: any
         ) =>
           | boolean
-          | undefined
+          | undefined | null
           | ((
               ...args: any
-            ) => boolean | undefined | Promise<boolean | undefined>)
+            ) => boolean | undefined | null | Promise<boolean | undefined | null>)
           | Promise<
               | boolean
-              | undefined
+              | undefined | null
               | ((
                   ...args: any
-                ) => boolean | undefined | Promise<boolean | undefined>)
+                ) => boolean | undefined | null | Promise<boolean | undefined | null>)
             >;
       };
     }>({} as $.Infer<typeof s>);
