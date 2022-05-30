@@ -42,7 +42,7 @@ declare class TrivialSchemaType<T> extends SchemaType<T> {
     /**
      * Define type to be non-nullable
      */
-    required(): TrivialSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined>>>;
+    required(): TrivialSchemaType<TrivialResolver<Exclude<Resolved<T>, undefined | null>>>;
     docstring(str: string): TrivialSchemaType<T>;
 }
 type TrivialResolver<T = unknown> = T | ((...args: any) => T | Promise<T>);
@@ -52,16 +52,16 @@ interface Arguments {
 type Resolved<T> = T extends Arguments ? {
     [K in keyof T]: Resolved<T[K]>;
 } : T extends TrivialResolver<infer T> ? T : never;
-export const boolean: TrivialSchemaType<TrivialResolver<boolean | undefined>>;
-export const int: TrivialSchemaType<TrivialResolver<number | undefined>>;
-export const float: TrivialSchemaType<TrivialResolver<number | undefined>>;
-export const string: TrivialSchemaType<TrivialResolver<string | undefined>>;
-export const id: TrivialSchemaType<TrivialResolver<string | undefined>>;
+export const boolean: TrivialSchemaType<TrivialResolver<boolean | null | undefined>>;
+export const int: TrivialSchemaType<TrivialResolver<number | null | undefined>>;
+export const float: TrivialSchemaType<TrivialResolver<number | null | undefined>>;
+export const string: TrivialSchemaType<TrivialResolver<string | null | undefined>>;
+export const id: TrivialSchemaType<TrivialResolver<string | null | undefined>>;
 /**
  * @deprecated use `$.boolean` instead
  */
-export const bool: TrivialSchemaType<TrivialResolver<boolean | undefined>>;
-declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[] | undefined>> {
+export const bool: TrivialSchemaType<TrivialResolver<boolean | null | undefined>>;
+declare class ArraySchemaType<T> extends TrivialSchemaType<TrivialResolver<Resolved<T>[] | undefined | null>> {
     inner: SchemaType<T>;
     worksInInput: boolean;
     constructor(gql: string, inner: SchemaType<T>);
@@ -73,7 +73,7 @@ type Common<A, B> = {
     [P in keyof A & keyof B]: A[P] | B[P];
 };
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
-declare class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> {
+declare class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
     protected readonly name: string;
     shape: T;
     written: SharedBoolean;
@@ -86,12 +86,12 @@ declare class InterfaceSchemaType<T = object | undefined> extends SchemaType<T> 
     /**
      * Create a new type extending this one
      */
-    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<Exclude<T, undefined>, TypeOfShape<S>> | undefined>;
+    extend<S extends Shape = Shape>(name: string, shape: S): InterfaceSchemaType<Merge<Exclude<T, undefined | null>, TypeOfShape<S>> | undefined | null>;
     toGraphQL(): string;
-    required(): InterfaceSchemaType<Exclude<T, undefined>>;
+    required(): InterfaceSchemaType<Exclude<T, undefined | null>>;
     typeDocstring(str: string): InterfaceSchemaType<T>;
 }
-export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S> | undefined>;
+export const type: <S extends Shape = Shape>(name: string, shape: S) => InterfaceSchemaType<TypeOfShape<S> | null | undefined>;
 declare class ResolverSchemaType<R extends SchemaType, F extends (...args: any) => TypeOfShape<R> | Promise<TypeOfShape<R>>> extends SchemaType<F> {
     constructor(args: Parameters<F>[0], returns: R);
     clone(): ResolverSchemaType<R, F>;
@@ -105,10 +105,10 @@ type InputSchemaField = TrivialSchemaType<any> | ReturnType<typeof array> | Inpu
 interface InputShape {
     [key: string]: InputSchemaField;
 }
-declare class InputSchemaType<T = object | undefined> extends InterfaceSchemaType<T> {
+declare class InputSchemaType<T = object | undefined | null> extends InterfaceSchemaType<T> {
     constructor(name: string, shape: T, written: SharedBoolean);
     _body(): string;
-    required(): InputSchemaType<Exclude<T, undefined>>;
+    required(): InputSchemaType<Exclude<T, undefined | null>>;
 }
 export const input: <S extends InputShape = InputShape>(name: string, shape: S) => InputSchemaType<TypeOfShape<S>>;
 declare class Schema<Q extends object = object, M extends object = object> extends InterfaceSchemaType<{
