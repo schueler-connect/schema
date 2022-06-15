@@ -229,5 +229,5 @@ const myResolvers: schemaTypings = {
 <div align="center">
 <img alt="" src="assets/footer.png"/>
 <p>Copyright © 2022-present <a href="https://github.com/codemaster138/">@codemaster138</a> & <a href="https://github.com/cubeforme/">@cubeforme</a></p>
-<img alt="NPM" src="https://img.shields.io/npm/l/scadm?color=orange&style=for-the-badge">
+<img alt="NPM" src="https://img.shields.io/npm/l/@schuelerconnect/schema?color=orange&style=for-the-badge">
 </div>
