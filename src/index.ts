@@ -1,6 +1,4 @@
-export type Infer<S> = S extends SchemaType<infer X>
-  ? X
-  : never;
+export type Infer<S> = S extends SchemaType<infer X> ? X : never;
 
 type TypeOfShape<S extends SchemaType | Shape> = S extends SchemaType<infer X>
   ? X
@@ -20,12 +18,20 @@ export class SchemaType<T = unknown> {
   // Required for type inference
   public p?: T;
   public _docstring?: string;
+  // public _directives: { name: string; parameters: { [key: string]: any } }[] =
+  //   [];
 
   constructor() {}
 
   clone(): SchemaType<T> {
     throw "not implemented";
   }
+
+  // directive(name: string, parameters: { [key: string]: any }): SchemaType<T> {
+  //   const clone = this.clone();
+  //   clone._directives.push({ name, parameters });
+  //   return clone;
+  // }
 
   /**
    * @hidden
@@ -70,7 +76,9 @@ class TrivialSchemaType<T> extends SchemaType<T> {
   }
 
   clone() {
-    return new TrivialSchemaType<T>(this.gql);
+    const t = new TrivialSchemaType<T>(this.gql);
+    // t._directives = [...this._directives];
+    return t;
   }
 
   _render() {
@@ -120,18 +128,18 @@ type Resolved<T> = T extends Arguments
 export const boolean = new TrivialSchemaType<
   TrivialResolver<boolean | undefined | null>
 >("Boolean");
-export const int = new TrivialSchemaType<TrivialResolver<number | undefined | null>>(
-  "Int"
-);
-export const float = new TrivialSchemaType<TrivialResolver<number | undefined | null>>(
-  "Float"
-);
+export const int = new TrivialSchemaType<
+  TrivialResolver<number | undefined | null>
+>("Int");
+export const float = new TrivialSchemaType<
+  TrivialResolver<number | undefined | null>
+>("Float");
 export const string = new TrivialSchemaType<
   TrivialResolver<string | undefined | null>
 >("String");
-export const id = new TrivialSchemaType<TrivialResolver<string | undefined | null>>(
-  "ID"
-);
+export const id = new TrivialSchemaType<
+  TrivialResolver<string | undefined | null>
+>("ID");
 
 /**
  * @deprecated use `$.boolean` instead
@@ -151,7 +159,9 @@ class ArraySchemaType<T> extends TrivialSchemaType<
   }
 
   clone() {
-    return new ArraySchemaType<T>(this.gql, this.inner);
+    const t = new ArraySchemaType<T>(this.gql, this.inner);
+    // t._directives = [...this._directives];
+    return t;
   }
 
   _reset() {
@@ -168,8 +178,22 @@ type Common<A, B> = {
 
 type Merge<A, B> = Omit<A, keyof Common<A, B>> & B;
 
+// function renderDirectives(
+//   directives: { name: string; parameters: { [key: string]: any } }[]
+// ) {
+//   return directives
+//     .map(
+//       (dir: any) =>
+//         ` @${dir.name}(${Object.entries(dir.parameters)
+//           .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+//           .join(", ")})`
+//     )
+//     .join("");
+// }
+
 class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
   protected _gdocstring: string = "";
+  // protected _gdirectives: { [key: string]: any }[] = [];
 
   constructor(
     protected readonly name: string,
@@ -180,7 +204,10 @@ class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
   }
 
   clone() {
-    return new InterfaceSchemaType<T>(this.name, this.shape, this.written);
+    const t = new InterfaceSchemaType<T>(this.name, this.shape, this.written);
+    // t._directives = [...this._directives];
+    // t._gdirectives = [...this._gdirectives];
+    return t;
   }
 
   _render() {
@@ -198,7 +225,9 @@ class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
           ([k, v]) =>
             `${
               v._docstring ? `"""\n${v._docstring}\n"""\n` : ""
-            }${k}${v._params()}: ${v._render()}`
+            }${k}${v._params()}: ${v._render()}${/*renderDirectives(
+              v._directives
+						)*/''}`
         )
         .join(",\n")
     )}\n}\n\n${Object.values(this.shape)
@@ -210,6 +239,12 @@ class InterfaceSchemaType<T = object | undefined | null> extends SchemaType<T> {
     this.written.inner = false;
     Object.values(this.shape).forEach((v: SchemaType) => v._reset());
   }
+
+  // typeDirective(name: string, parameters: { [key: string]: any }) {
+  //   const t = this.clone();
+  //   t._gdirectives.push({ name, parameters });
+  //   return t;
+  // }
 
   /**
    * Create a new type extending this one
@@ -277,7 +312,9 @@ class ResolverSchemaType<
   }
 
   clone() {
-    return new ResolverSchemaType<R, F>(this.args, this.returns);
+    const t = new ResolverSchemaType<R, F>(this.args, this.returns);
+    // t._directives = [...this._directives];
+    return t;
   }
 
   _body() {
@@ -329,10 +366,17 @@ interface InputShape {
   [key: string]: InputSchemaField;
 }
 
-class InputSchemaType<T = object | undefined | null> extends InterfaceSchemaType<T> {
+class InputSchemaType<
+  T = object | undefined | null
+> extends InterfaceSchemaType<T> {
   constructor(name: string, shape: T, written: SharedBoolean) {
     super(name, shape, written);
   }
+
+	clone() {
+		const t = new InputSchemaType(this.name, this.shape, this.written);
+		return t;
+	}
 
   _body(): string {
     if (this.written.inner) return "";
@@ -389,7 +433,9 @@ class Schema<
   }
 
   clone() {
-    return new Schema<Q, M>(this.queries, this.mutations);
+    const t = new Schema<Q, M>(this.queries, this.mutations);
+		// t._directives = [...t._directives];
+		return t;
   }
 
   toGraphQL(): string {
@@ -414,9 +460,3 @@ export const schema = <Q extends Shape = Shape, M extends Shape = Shape>(
     type("Query", queries).required(),
     type("Mutation", mutations).required()
   );
-
-const a = type('A', {
-	s: string
-});
-
-type t = Infer<typeof a>;
